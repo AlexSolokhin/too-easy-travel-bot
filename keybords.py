@@ -2,6 +2,11 @@ from telebot import types
 
 
 def simple_keyboard():
+    """
+    Создаёт простую клавиатуру с одной кнопкой "Прервать поиск"
+
+    :return: keyboard
+    """
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     stop_search = types.KeyboardButton('Прервать поиск')
     keyboard.add(stop_search)
@@ -9,6 +14,11 @@ def simple_keyboard():
 
 
 def yes_no_keyboard():
+    """
+    Создаёт клавиатуру с кнопками "Да", "Нет" и "Прервать поиск"
+
+    :return: keyboard
+    """
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     yes = types.KeyboardButton('Да')
     no = types.KeyboardButton('Нет')
@@ -18,7 +28,12 @@ def yes_no_keyboard():
     return keyboard
 
 
-def one_to_ten_keybord():
+def one_to_ten_keyboard():
+    """
+    Создаёт клавиатуру с кнопками от 1 до 10 и кнопкой "Прервать поиск"
+
+    :return: keyboard
+    """
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     one = types.KeyboardButton('1')
     two = types.KeyboardButton('2')
@@ -37,6 +52,11 @@ def one_to_ten_keybord():
 
 
 def help_keyboard():
+    """
+    Создаёт клавиатуру с основными командами бота
+
+    :return: keyboard
+    """
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     lowprice = types.KeyboardButton('/lowprice')
     highprice = types.KeyboardButton('/highprice')
