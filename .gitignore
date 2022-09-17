@@ -364,7 +364,6 @@ FodyWeavers.xsd
 
 ### Python template
 # Byte-compiled / optimized / DLL files
-__pycache__/
 *.py[cod]
 *$py.class
 
@@ -421,7 +420,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -570,9 +568,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-### Linux template
-*~
-
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
 
@@ -613,5 +608,4 @@ $RECYCLE.BIN/
 
 #Черновики практических работ
 drafts/
-
 /Module31/03_breaking_bad/most_deadly_episode.json
