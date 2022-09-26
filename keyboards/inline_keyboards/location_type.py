@@ -21,4 +21,5 @@ def location_type_keyboard() -> types.InlineKeyboardMarkup:
     keyboard.add(landmark_group)
     keyboard.add(transport_group)
     keyboard.add(stop_search)
+    
     return keyboard

@@ -1,18 +1,21 @@
-import json
 from loader import bot
+import json
+import re
 from datetime import datetime
 from telebot.types import CallbackQuery, InputMediaPhoto
 from handlers.API_handlers import request_hotels
 from handlers.API_handlers import request_photo
 from states.travel_information import TravelInfoState
+from database.history_db_methods import add_history_to_db, add_hotels_to_history_db
 from keyboards.reply_keyboards.default_keyboard import default_keyboard
 from keyboards.inline_keyboards.next_hotel import next_hotel_keyboard
-from keyboards.inline_keyboards.hotel_details import hotel_details_keyboard
+from utils.show_hotels import show_hotel
 
 
 def summary_message_handler(search_data: dict, chat_id: int) -> None:
     """
     Генерация и отправка сообщения, в котором собраны все данные, переданные пользователем.
+    Также сохраняет детали заброса в бд.
 
     :param search_data: словарь с данными, переданными пользователем
     :type search_data: dict
@@ -21,25 +24,41 @@ def summary_message_handler(search_data: dict, chat_id: int) -> None:
     :return: None
     """
 
+    command = search_data['command']
+    location = search_data["location"]
+    check_in = search_data["checkin_date"].strftime("%d-%m-%Y")
+    check_out = search_data["checkout_date"].strftime("%d-%m-%Y")
+    min_price = search_data.get('min_price', None)
+    max_price = search_data.get('max_price', None)
+    min_dist = search_data.get('min_dist', None)
+    max_dist = search_data.get('max_dist', None)
+
     filters_string = ''
 
-    if search_data['command'] == 'lowprice':
+    if command == 'lowprice':
         category_string = 'самые дешёвые отели'
-    elif search_data['command'] == 'highprice':
+    elif command == 'highprice':
         category_string = 'самые дорогие отели'
     else:
         category_string = 'отели с учётом цены и расстояния от центра города'
-        filters_string = f'\nМинимальная цена за ночь: {search_data["min_price"]} рублей\n' \
-                         f'Максимальная цена за ночь: {search_data["max_price"]} рублей\n' \
-                         f'Минимальное расстояние от центра: {search_data["min_dist"]}\n км' \
-                         f'Максимальное расстояние от центра: {search_data["max_dist"]} км'
+        filters_string = f'\n*Минимальная цена за ночь:* {min_price} рублей\n' \
+                         f'*Максимальная цена за ночь*: {max_price} рублей\n' \
+                         f'*Минимальное расстояние от центра*: {min_dist} км\n' \
+                         f'*Максимальное расстояние от центра*: {max_dist} км'
 
-    summary_message = f'Итак, мы ищем {category_string} в локации: {search_data["location"]}\n' \
-                      f'Дата заезда: {search_data["checkin_date"].strftime("%d-%m-%Y")}\n' \
-                      f'Дата выезда: {search_data["checkout_date"].strftime("%d-%m-%Y")}' \
+    summary_message = f'Итак, мы ищем *{category_string}* в локации: *{location}*\n' \
+                      f'*Дата заезда:* {check_in}\n' \
+                      f'*Дата выезда:* {check_out}' \
                       f'{filters_string}'
 
-    bot.send_message(chat_id, summary_message)
+    summary_message = re.sub(r'-', r'[\-]', summary_message)
+    summary_message = re.sub(r'[.]', r'[\.]', summary_message)
+    summary_message = re.sub(r'[(]', r'[\(]', summary_message)
+    summary_message = re.sub(r'[)]', r'[\)]', summary_message)
+
+    bot.send_message(chat_id, summary_message, parse_mode='MarkdownV2')
+    add_history_to_db(chat_id, command, location, check_in, check_out, min_price, max_price, min_dist, max_dist)
+
     bot.send_message(chat_id, 'Погнали?',
                      reply_markup=next_hotel_keyboard('Поехали!', 'INIT', 1, -1))
 
@@ -49,6 +68,7 @@ def summary_message_handler(search_data: dict, chat_id: int) -> None:
 def results_handler(callback: CallbackQuery) -> None:
     """
     Выдача отелей по одному.
+    Сохранение выданных отелей в бд для истории поиска.
 
     :param callback: Объект CallBackQuery
     :type: CallbackQuery
@@ -78,7 +98,9 @@ def results_handler(callback: CallbackQuery) -> None:
                                   reply_markup=default_keyboard())
 
     else:
+        add_hotels_to_history_db(chat_id, hotels_list[hotel_num]['id'], hotels_list[hotel_num]['name'])
         show_hotel(hotels_list[hotel_num], chat_id)
+
         if hotel_num == 24:
             page_num += 1
             hotel_num = 0
@@ -91,40 +113,8 @@ def results_handler(callback: CallbackQuery) -> None:
     bot.answer_callback_query(callback.id)
 
 
-def show_hotel(hotel: dict, chat_id: int) -> None:
-    """
-    Выдача информации по отелю.
-
-    :param hotel: словарь отеля
-    :type hotel: dict
-    :param chat_id: id чата
-    :type chat_id: int
-    :return: None
-    """
-
-    hotel_name = hotel['name']
-    country = hotel['address'].get('countryName')
-    city = hotel['address'].get('locality')
-    street_adr = hotel['address'].get('streetAddress', 'Полный адрес доступен после бронирования.')
-    distance = hotel['from_center']
-    price_per_night = hotel['price']
-    total_price = hotel['total_price']
-    hotel_id = hotel["id"]
-    hotel_link = f'https://www.hotels.com/ho{hotel_id}'
-
-    hotel_description = f'Отель: {hotel_name}\n' \
-                        f'Расположен по адресу: {country},\t{city},\t{street_adr}\n' \
-                        f'Расстояние от центра (км): {distance}\n' \
-                        f'Цена за ночь: {price_per_night} рублей\n' \
-                        f'Общая стоимость: {total_price}\n рублей' \
-
-    bot.send_message(chat_id, hotel_description,
-                     reply_markup=hotel_details_keyboard(hotel_id, hotel_link, False, False))
-
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith('PHOTO'),
-                            state=TravelInfoState.show_hotels)
-def show_hotel_with_photo(callback: CallbackQuery) -> None:
+@bot.callback_query_handler(func=lambda call: call.data.startswith('PHOTO'))
+def show_hotel_photo(callback: CallbackQuery) -> None:
     """
     Выдача фото отеля.
 
@@ -161,3 +151,5 @@ def hide_hotel(callback: CallbackQuery) -> None:
     bot.delete_message(callback.message.chat.id, callback.message.id)
 
     bot.answer_callback_query(callback.id)
+
+# TODO - заменить default_keyboard: reply на inline

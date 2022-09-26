@@ -12,3 +12,5 @@ class TravelInfoState(StatesGroup):
     min_dist = State()
     max_dist = State()
     show_hotels = State()
+    show_history = State()
+    show_favorites = State()

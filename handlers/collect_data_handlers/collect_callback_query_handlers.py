@@ -150,8 +150,8 @@ def get_checkout_date(callback: CallbackQuery) -> None:
                                      reply_markup=default_keyboard())
 
                 else:
-                    summary_message_handler(data, callback.message.chat.id)
                     bot.set_state(callback.from_user.id, TravelInfoState.show_hotels, callback.message.chat.id)
+                    summary_message_handler(data, callback.message.chat.id)
 
     elif action == 'CANCEL':
         cancel_search(callback.from_user.id, callback.message.chat.id)

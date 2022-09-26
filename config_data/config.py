@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv, find_dotenv
+from peewee import SqliteDatabase
 from telebot_calendar import Calendar, CallbackData, RUSSIAN_LANGUAGE
 
 if not find_dotenv():
@@ -16,8 +17,12 @@ DEFAULT_COMMANDS = (
     ('highprice', "Показывает топ самых дорогих отелей по выбранному направлению"),
     ('bestdeal', "Показывает топ предложений по запросу пользователя (близость к центру, цена)"),
     ('history', "Выдаёт историю поиска для пользователя"),
+    ('favorites', "Выдаёт избранные отели"),
     ('help', "Выводит справку по командам бота")
 )
+
+db = SqliteDatabase('hotel-bot.db')
+
 CALENDAR = Calendar(RUSSIAN_LANGUAGE)
 CALENDAR_CALLBACK = CallbackData("calendar", "action", "year", "month", "day")
 

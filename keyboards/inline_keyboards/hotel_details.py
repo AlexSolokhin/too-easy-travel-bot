@@ -1,8 +1,7 @@
 from telebot import types
 
 
-def hotel_details_keyboard(hotel_id: str,
-                           hotel_link: str,
+def hotel_details_keyboard(hotel_id: int,
                            photo_shown: bool,
                            in_favorites: bool
                            ) -> types.InlineKeyboardMarkup:
@@ -11,8 +10,6 @@ def hotel_details_keyboard(hotel_id: str,
 
     :param hotel_id: id отеля
     :type hotel_id: int
-    :param hotel_link: ссылка на отель
-    :type hotel_link: str
     :param photo_shown: флаг - показаны ли фото
     :type photo_shown: bool
     :param in_favorites: Флаг - добавлен ли в избранное
@@ -20,6 +17,8 @@ def hotel_details_keyboard(hotel_id: str,
     :return: keyboard
     :rtype: InlineKeyboardMarkup
     """
+
+    hotel_link = f'https://www.hotels.com/ho{hotel_id}'
 
     keyboard = types.InlineKeyboardMarkup()
 
