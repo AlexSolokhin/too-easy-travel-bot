@@ -3,8 +3,8 @@ from config_data.config import CALENDAR, CALENDAR_CALLBACK
 from telebot.types import CallbackQuery
 from datetime import datetime
 from states.travel_information import TravelInfoState
-from handlers.other_handlers.search_stop_or_try_again import try_again_search, cancel_search
-from handlers.hotels_handlers.search_results_handlers import summary_message_handler
+from utils.restart_and_cancel import cancel_search
+from utils.summary_message import summary_message_handler
 from keyboards.inline_keyboards.calendar import calendar_keyboard
 from keyboards.reply_keyboards.default_keyboard import default_keyboard
 
@@ -19,9 +19,6 @@ def get_location_type(callback: CallbackQuery) -> None:
     :type: CallbackQuery
     :return: None
     """
-
-    # TODO Решить: убирать или не убирать инлайн клавиатуру на следующих шагах
-    # bot.edit_message_reply_markup(callback.message.chat.id, callback.message.id, reply_markup=None)
 
     if callback.data == 'TRANSPORT_GROUP':
         bot.send_message(callback.message.chat.id, 'Понял! Буду искать рядом с аэропортом или вокзалом.')
@@ -56,7 +53,6 @@ def get_specified_location(callback: CallbackQuery) -> None:
     :type: CallbackQuery
     :return: None
     """
-    # TODO Настроить валидацию даты, если дата раньше, чем сегодня
 
     bot.set_state(callback.from_user.id, TravelInfoState.checkin_date, callback.message.chat.id)
     bot.send_message(callback.message.chat.id, 'Выбери дату, когда ты планируешь заселяться?',
@@ -96,13 +92,14 @@ def get_checkin_date(callback: CallbackQuery) -> None:
             bot.send_message(callback.message.chat.id, 'Дата заезда не должна быть в прошлом. Попробуй ещё раз!',
                              reply_markup=calendar_keyboard(CALENDAR, CALENDAR_CALLBACK))
 
-        bot.send_message(callback.message.chat.id, f'Выбрана дата заезда: {date.strftime("%d-%m-%Y")}')
-        bot.set_state(callback.from_user.id, TravelInfoState.checkout_date, callback.message.chat.id)
-        bot.send_message(callback.message.chat.id, 'Выбери дату, когда ты планируешь выселяться?',
-                         reply_markup=calendar_keyboard(CALENDAR, CALENDAR_CALLBACK))
+        else:
+            bot.send_message(callback.message.chat.id, f'Выбрана дата заезда: {date.strftime("%d-%m-%Y")}')
+            bot.set_state(callback.from_user.id, TravelInfoState.checkout_date, callback.message.chat.id)
+            bot.send_message(callback.message.chat.id, 'Выбери дату, когда ты планируешь выселяться? 📅',
+                             reply_markup=calendar_keyboard(CALENDAR, CALENDAR_CALLBACK))
 
-        with bot.retrieve_data(callback.from_user.id, callback.message.chat.id) as data:
-            data['checkin_date'] = date
+            with bot.retrieve_data(callback.from_user.id, callback.message.chat.id) as data:
+                data['checkin_date'] = date
 
     elif action == 'CANCEL':
         cancel_search(callback.from_user.id, callback.message.chat.id)
@@ -157,31 +154,3 @@ def get_checkout_date(callback: CallbackQuery) -> None:
         cancel_search(callback.from_user.id, callback.message.chat.id)
 
         bot.answer_callback_query(callback.id)
-
-
-@bot.callback_query_handler(func=lambda call: call.data == 'TRY_AGAIN')
-def try_again_callback_handler(callback: CallbackQuery) -> None:
-    """
-    Вызов команды перезапуска поиска из коллбэка.
-
-    :param callback: Объект CallBackQuery
-    :type: CallbackQuery
-    :return: None
-    """
-    bot.edit_message_reply_markup(callback.message.chat.id, callback.message.id, reply_markup=None)
-    try_again_search(callback.from_user.id, callback.message.chat.id)
-    bot.answer_callback_query(callback.id)
-
-
-@bot.callback_query_handler(func=lambda call: call.data == 'CANCEL')
-def cancel_callback_handler(callback: CallbackQuery) -> None:
-    """
-    Вызов команды остановки поиска из коллбэка.
-
-    :param callback: Объект CallBackQuery
-    :type: CallbackQuery
-    :return: None
-    """
-    bot.edit_message_reply_markup(callback.message.chat.id, callback.message.id, reply_markup=None)
-    cancel_search(callback.from_user.id, callback.message.chat.id)
-    bot.answer_callback_query(callback.id)

@@ -1,8 +1,10 @@
 import requests
 from requests.models import Response
 from typing import Optional
+from logger_config import logger
 
 
+@logger.catch
 def connect_rapid_api(url: str, header: dict, req_params: dict) -> Optional[Response]:
     """
     Установка соединения с API Hotels.com.
@@ -17,15 +19,11 @@ def connect_rapid_api(url: str, header: dict, req_params: dict) -> Optional[Resp
     :rtype: Response
     """
 
-    try:
-        response = requests.get(url,
-                                headers=header,
-                                params=req_params,
-                                timeout=10)
-        if response.status_code == requests.codes.ok:
-            return response
-        else:
-            raise ConnectionError(f'Возникли проблемы с подключением к API. Код ответа: {response.status_code}')
-    except (Exception, ConnectionError) as error:
-        print(error)
-        # TODO Добавить логирование сюда и передачу ошибки в бот
+    response = requests.get(url,
+                            headers=header,
+                            params=req_params,
+                            timeout=10)
+    if response.status_code == requests.codes.ok:
+        return response
+    else:
+        raise ConnectionError(f'Возникли проблемы с подключением к API. Код ответа: {response.status_code}')

@@ -12,6 +12,7 @@ def help_command(message: Message) -> None:
     :type message: Message
     :return: None
     """
+
     bot.send_message(message.chat.id, "Вот, что я умею:\n"
                                       "\n"
                                       "/lowprice: покажу топ самых дешевых отелей по выбранному направлению\n"

@@ -11,8 +11,8 @@ def history_keyboard(history_record_id: int) -> types.InlineKeyboardMarkup:
 
     keyboard = types.InlineKeyboardMarkup()
 
-    delete = types.InlineKeyboardButton(text='Удалить запись', callback_data='DELETE|' + str(history_record_id))
-    clear_history = types.InlineKeyboardButton(text='Очистить историю', callback_data='CLEAR')
+    delete = types.InlineKeyboardButton(text='❌Удалить запись', callback_data='DELETE|' + str(history_record_id))
+    clear_history = types.InlineKeyboardButton(text='💣Очистить историю', callback_data='CLEAR')
 
     keyboard.add(delete)
     keyboard.add(clear_history)

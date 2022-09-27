@@ -1,10 +1,11 @@
 from config_data.config import db
-from database.db_models import Users, History
-from datetime import datetime
 import json
 import re
+from database.db_models import Users, History
+from logger_config import logger
 
 
+@logger.catch
 def add_history_to_db(telegram_id: int,
                       command: str,
                       location: str,
@@ -58,6 +59,7 @@ def add_history_to_db(telegram_id: int,
         history_row.save()
 
 
+@logger.catch
 def add_hotels_to_history_db(telegram_id: int, hotel_id: int, hotel_name: str) -> None:
     """
     Добавляет отель в запись истории.
@@ -117,7 +119,7 @@ def history_row_to_message(record: History) -> str:
 
     message_extender = ''
     if command == 'bestdeal':
-        message_extender = f'*Минимальная цена:* {min_price}, максимальная цена: {max_price}\n' \
+        message_extender = f'*Минимальная цена:* {min_price}, *максимальная цена*: {max_price}\n' \
                            f'*Минимальное расстояние до центра:* {min_dist}\n' \
                            f'*Максимальное расстояние до центра:* {max_dist}\n'
 

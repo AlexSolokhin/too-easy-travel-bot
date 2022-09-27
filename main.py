@@ -1,7 +1,5 @@
-# TODO Функция History и Add_to_Favorite
 # TODO Отредактировать docstring в единый формат
 # TODO Настроить логирование
-# TODO Сделать и использовать свои Exceptions
 
 from loader import bot
 import handlers

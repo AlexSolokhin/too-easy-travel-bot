@@ -12,6 +12,7 @@ def greetings(message: Message) -> None:
     :type message: Message
     :return: None
     """
-    bot.send_message(message.chat.id, 'Привет! Я помогу тебе найти лучшие отели по всему миру. '
+
+    bot.send_message(message.chat.id, 'Привет! Я помогу тебе найти лучшие отели по всему миру 🌍'
                                       'Чтобы начать, введи команду или введи /help для справки!',
                      reply_markup=help_keyboard())

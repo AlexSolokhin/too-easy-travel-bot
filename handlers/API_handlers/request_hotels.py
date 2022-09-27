@@ -4,8 +4,10 @@ import datetime
 from typing import List, Optional
 from . import connect_rapid_api
 from loader import rapid_api
+from logger_config import logger
 
 
+@logger.catch
 def request_hotels(search_data: dict, page: int = 1) -> Optional[List]:
     """
     Принимает на вход словарь с ответами пользователя, дополнительно его обрабатывает.

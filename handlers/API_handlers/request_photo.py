@@ -3,8 +3,10 @@ import re
 from typing import List, Optional
 from . import connect_rapid_api
 from loader import rapid_api
+from logger_config import logger
 
 
+@logger.catch
 def request_photo(hotel_id: int) -> Optional[List]:
 
     req_params = {"id": hotel_id}

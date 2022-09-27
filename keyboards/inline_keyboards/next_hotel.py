@@ -26,8 +26,8 @@ def next_hotel_keyboard(text: str, method: str, page_num: int, hotel_num: int) -
                                             ',"hotel_num":' + str(hotel_num + 1) +
                                             '}'
                                             )
-    try_again = types.InlineKeyboardButton(text='Начать сначала', callback_data='TRY_AGAIN')
-    stop_search = types.InlineKeyboardButton(text='Прервать поиск', callback_data='CANCEL')
+    try_again = types.InlineKeyboardButton(text='↩Начать сначала', callback_data='TRY_AGAIN')
+    stop_search = types.InlineKeyboardButton(text='🛑Прервать поиск', callback_data='CANCEL')
 
     keyboard.add(show_hotel)
     keyboard.add(try_again)

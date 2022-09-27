@@ -7,8 +7,6 @@ from database.db_models import Favorites, Users
 from database.favorites_db_methods import add_favorite_to_db, delete_favorite_from_db
 from keyboards.inline_keyboards.hotel_details import hotel_details_keyboard
 
-# TODO Добавить условие, если избранного нет
-
 
 @bot.message_handler(commands=['favorites'])
 def show_favorites(message: Message) -> None:
@@ -25,11 +23,18 @@ def show_favorites(message: Message) -> None:
 
     with db:
         favorite_hotels = Favorites.select().join(Users).where(Users.telegram_id == telegram_id)
-        for hotel in favorite_hotels:
-            hotel_id = hotel.hotel_id
 
-            bot.send_message(message.chat.id, hotel.hotel,
-                             reply_markup=hotel_details_keyboard(hotel_id, False, True))
+        if len(favorite_hotels) > 0:
+            for hotel in favorite_hotels:
+                hotel_id = hotel.hotel_id
+
+                bot.send_message(message.chat.id, hotel.hotel,
+                                 reply_markup=hotel_details_keyboard(hotel_id, False, True))
+
+        else:
+            bot.send_message(message.chat.id, 'К сожалению, в избранном нет ни одного отеля 😔\n'
+                                              'Ты можешь найти отели с помощью команд /lowprice, /highprice и /bestdeal'
+                                              'и добавить любой найденный отель в избранное ⭐')
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('ADD_FAVORITE'))

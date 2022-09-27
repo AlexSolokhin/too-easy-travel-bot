@@ -22,14 +22,14 @@ def hotel_details_keyboard(hotel_id: int,
 
     keyboard = types.InlineKeyboardMarkup()
 
-    book = types.InlineKeyboardButton(text='Забронировать', url=hotel_link)
-    show_photo = types.InlineKeyboardButton(text='Показать фото',
+    book = types.InlineKeyboardButton(text='🔑Забронировать', url=hotel_link)
+    show_photo = types.InlineKeyboardButton(text='📸Показать фото',
                                             callback_data='PHOTO|' + str(hotel_id))
-    add_to_favorite = types.InlineKeyboardButton(text='Добавить в избранное',
+    add_to_favorite = types.InlineKeyboardButton(text='🔅Добавить в избранное',
                                                  callback_data='ADD_FAVORITE|' + str(hotel_id))
-    delete_favorite = types.InlineKeyboardButton(text='Убрать из избранного',
+    delete_favorite = types.InlineKeyboardButton(text='🔆Убрать из избранного',
                                                  callback_data='DELETE_FAVORITE|' + str(hotel_id))
-    hide = types.InlineKeyboardButton(text='Скрыть', callback_data='HIDE')
+    hide = types.InlineKeyboardButton(text='❎Скрыть', callback_data='HIDE')
 
     keyboard.add(book)
     if not photo_shown:

@@ -7,7 +7,6 @@ from database.db_models import History, Users
 from database.history_db_methods import history_row_to_message
 from keyboards.inline_keyboards.history import history_keyboard
 
-# TODO Добавить условие, если история пуста
 
 @bot.message_handler(commands=['history'])
 def show_history(message: Message) -> None:
@@ -24,12 +23,18 @@ def show_history(message: Message) -> None:
 
     with db:
         user_history = History.select().join(Users).where(Users.telegram_id == telegram_id)
-        for record in user_history:
-            message_text = history_row_to_message(record)
 
-            bot.send_message(message.chat.id, message_text,
-                             reply_markup=history_keyboard(record.id),
-                             parse_mode='MarkdownV2')
+        if len(user_history) > 0:
+            for record in user_history:
+                message_text = history_row_to_message(record)
+
+                bot.send_message(message.chat.id, message_text,
+                                 reply_markup=history_keyboard(record.id),
+                                 parse_mode='MarkdownV2')
+        else:
+            bot.send_message(message.chat.id, 'К сожалению, в истории нет ни одной записи 😔\n'
+                                              'Ты можешь начать поиск с помощью команд /lowprice, /highprice и /bestdeal.'
+                                              'Выполненный поиск будет автоматически добавлен в историю 📜')
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('DELETE'), state=TravelInfoState.show_history)
@@ -70,4 +75,4 @@ def delete_record(callback: CallbackQuery) -> None:
             record.delete_instance()
 
     bot.answer_callback_query(callback.id)
-    bot.send_message(telegram_id, 'История очищена')
+    bot.send_message(telegram_id, 'История очищена 👍')

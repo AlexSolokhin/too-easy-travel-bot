@@ -3,7 +3,7 @@ from states.travel_information import TravelInfoState
 from keyboards.inline_keyboards.location_type import location_type_keyboard
 
 
-def try_again_search(user_id: int, chat_id: int) -> None:
+def restart_search(user_id: int, chat_id: int) -> None:
     """
     Перезапуск поиска с прежней командой.
 
@@ -14,7 +14,7 @@ def try_again_search(user_id: int, chat_id: int) -> None:
     :return: None
     """
 
-    bot.send_message(chat_id, 'Поиск перезапущен')
+    bot.send_message(chat_id, 'Поиск перезапущен 👍')
     bot.send_message(chat_id, 'Где будем искать отели?', reply_markup=location_type_keyboard())
 
     bot.set_state(user_id, TravelInfoState.location_type, chat_id)
@@ -36,7 +36,7 @@ def cancel_search(user_id: int, chat_id: int) -> None:
     :return: None
     """
 
-    bot.send_message(chat_id, 'Поиск прерван.\nЕсли хочешь начать сначала введи команду или нажми /help')
+    bot.send_message(chat_id, 'Поиск прерван 👍\nЕсли хочешь начать сначала введи команду или нажми /help')
 
     bot.set_state(user_id, None, chat_id)
 

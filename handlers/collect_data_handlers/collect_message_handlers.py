@@ -3,14 +3,13 @@ from config_data.config import CALENDAR, CALENDAR_CALLBACK
 from re import fullmatch
 from telebot.types import Message
 from states.travel_information import TravelInfoState
-from handlers.other_handlers.search_stop_or_try_again import try_again_search, cancel_search
-from handlers.hotels_handlers.search_results_handlers import summary_message_handler
-# TODO причесать импорт клавиатур. Ибо Ад.
+from handlers.API_handlers import request_location
+from utils.restart_and_cancel import restart_search, cancel_search
+from utils.summary_message import summary_message_handler
 from keyboards.inline_keyboards.location_type import location_type_keyboard
 from keyboards.inline_keyboards.specify_location import specify_location_keyboard
 from keyboards.inline_keyboards.calendar import calendar_keyboard
 from keyboards.reply_keyboards.default_keyboard import default_keyboard
-from handlers.API_handlers import request_location
 
 
 @bot.message_handler(commands=['lowprice', 'highprice', 'bestdeal'])
@@ -24,15 +23,15 @@ def start_search(message: Message) -> None:
     """
 
     if message.text == '/lowprice':
-        first_message_text = 'Ищем самые дешёвые отели.'
+        first_message_text = 'Ищем самые дешёвые отели 🏢'
     elif message.text == '/highprice':
-        first_message_text = 'Ищем самые дорогие отели.'
+        first_message_text = 'Ищем самые дорогие отели 🏰'
     else:
-        first_message_text = 'Ищем отели по твоему запросу.'
+        first_message_text = 'Ищем отели по твоему запросу 👁'
 
     bot.set_state(message.from_user.id, TravelInfoState.location_type, message.chat.id)
 
-    bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}!\n{first_message_text}\n\n'
+    bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}✌!\n{first_message_text}\n\n'
                                       f'Где будем искать?',
                      reply_markup=location_type_keyboard())
 
@@ -75,7 +74,6 @@ def get_location(message: Message) -> None:
                 locations_response = request_location(data['location_type'], message.text)
 
             if locations_response:
-                # TODO - добавить эксепшн, если нет локейшн респонса
                 response_length = len(locations_response)
 
                 if response_length > 1:
@@ -91,15 +89,19 @@ def get_location(message: Message) -> None:
 
                     bot.set_state(message.from_user.id, TravelInfoState.checkin_date, message.chat.id)
                     bot.send_message(message.chat.id,
-                                     'Выбери дату, когда ты планируешь заселяться?',
+                                     'Выбери дату, когда ты планируешь заселяться? 📅',
                                      reply_markup=calendar_keyboard(CALENDAR, CALENDAR_CALLBACK))
 
                 else:
                     bot.send_message(message.chat.id,
-                                     'К сожалению, по твоему запросу я ничего не нашёл.\n Хочешь попробовать ещё раз?',
+                                     'К сожалению, по твоему запросу я ничего не нашёл 😔\n Хочешь попробовать ещё раз?',
                                      reply_markup=default_keyboard())
             else:
-                print('no response')
+                    bot.send_message(message.chat.id,
+                                     '😵 Упс, кажется что-то пошло не так! Попробуй повторить поиск.\n'
+                                     'Если ошибка будет повторяться снова и снова, свяжись с моим автором '
+                                     '- @Alex_Solokhin',
+                                     reply_markup=default_keyboard())
 
 
 @bot.message_handler(state=TravelInfoState.specify_location)
@@ -266,11 +268,11 @@ def check_cancel_or_try_again(message: Message) -> bool:
     :type message: Message
     :return: bool
     """
-    if message.text.lower() == 'начать сначала':
-        try_again_search(message.from_user.id, message.chat.id)
+    if message.text.lower() == '↩начать сначала':
+        restart_search(message.from_user.id, message.chat.id)
         return True
 
-    elif message.text.lower() == 'прервать поиск':
+    elif message.text.lower() == '🛑прервать поиск':
         cancel_search(message.from_user.id, message.chat.id)
         return True
 

@@ -1,7 +1,9 @@
 from config_data.config import db
 from database.db_models import Users, Favorites
+from logger_config import logger
 
 
+@logger.catch
 def add_favorite_to_db(telegram_id: int, hotel_id: int, hotel_descr: str) -> None:
     """
     Добавление избранного отеля в базу данных
@@ -20,6 +22,7 @@ def add_favorite_to_db(telegram_id: int, hotel_id: int, hotel_descr: str) -> Non
         Favorites.get_or_create(user=user, hotel_id=hotel_id, hotel=hotel_descr)
 
 
+@logger.catch
 def delete_favorite_from_db(telegram_id: int, hotel_id: int) -> None:
     """
     Удаляет отель из избранного.

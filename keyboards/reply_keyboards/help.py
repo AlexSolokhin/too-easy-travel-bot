@@ -14,10 +14,11 @@ def help_keyboard() -> types.ReplyKeyboardMarkup:
     highprice = types.KeyboardButton('/highprice')
     bestdeal = types.KeyboardButton('/bestdeal')
     history = types.KeyboardButton('/history')
+    favorites = types.KeyboardButton('/favorites')
     help_button = types.KeyboardButton('/help')
     keyboard.row(lowprice, highprice)
     keyboard.row(bestdeal)
-    keyboard.row(history)
+    keyboard.row(history, favorites)
     keyboard.row(help_button)
 
     return keyboard

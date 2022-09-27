@@ -1,18 +1,15 @@
 from telebot import types
 
 
-def specify_location_keyboard(locations_dict: dict) -> types.InlineKeyboardMarkup:
+def default_keyboard() -> types.InlineKeyboardMarkup:
     """
-    Создаёт клавиатуру для выбора конкретной локации из списка
+    Создаёт клавиатуру для остановки и/или перезапуска поиска
 
     :return: keyboard
     :rtype: InlineKeyboardMarkup
     """
 
     keyboard = types.InlineKeyboardMarkup(row_width=1)
-
-    for key in locations_dict.keys():
-        keyboard.add(types.InlineKeyboardButton(text=key, callback_data=key + '|' + locations_dict[key]))
 
     try_again = types.InlineKeyboardButton(text='↩Начать сначала', callback_data='TRY_AGAIN')
     stop_search = types.InlineKeyboardButton(text='🛑Прервать поиск', callback_data='CANCEL')
