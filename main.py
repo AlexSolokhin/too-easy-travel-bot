@@ -1,5 +1,5 @@
-# TODO Отредактировать docstring в единый формат
-# TODO Настроить логирование
+# TODO добавить readme
+# TODO обновить requirements
 
 from loader import bot
 import handlers
